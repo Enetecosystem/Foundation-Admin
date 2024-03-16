@@ -3,11 +3,11 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import ConvexClientProvider from "./ConvexClientProvider";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "My App Title",
-  description: "My app description",
+  title: "Enet Admin",
+  description: "The enet miner admin dashboard",
 };
 
 export default function RootLayout({
