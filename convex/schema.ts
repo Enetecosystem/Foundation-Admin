@@ -39,6 +39,7 @@ export default defineSchema(
         hours: v.number(),
         level: v.union(v.literal(1), v.literal(2), v.literal(3)),
       }),
+      tasks: v.optional(v.array(v.id("tasks"))),
     })
       .index("by_xpCount", ["xpCount"])
       .index("by_mineActive", ["mineActive"]),
@@ -52,6 +53,27 @@ export default defineSchema(
       link: v.string(),
       storageId: v.id("_storage"),
       expiresAt: v.optional(v.number()),
+    }),
+    tasks: defineTable({
+      name: v.string(),
+      reward: v.number(),
+      action: v.union(
+        v.object({
+          link: v.string(),
+          type: v.literal("join"),
+          socialNetwork: v.union(v.literal("telegram"), v.literal("discord")),
+        }),
+        v.object({
+          link: v.string(),
+          type: v.literal("visit"),
+          socialNetwork: v.literal("website"),
+        }),
+        v.object({
+          entity: v.string(),
+          socialNetwork: v.literal("twitter"),
+          type: v.union(v.literal("follow"), v.literal("post")),
+        }),
+      ),
     }),
   },
   // If you ever get an error about schema mismatch

@@ -1,7 +1,6 @@
 "use client";
 
 import MainLayout from "@/components/layout/main";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UploadButton, UploadFileResponse } from "@xixixao/uploadstuff/react";
 // import "@xixixao/uploadstuff/react/styles.css";

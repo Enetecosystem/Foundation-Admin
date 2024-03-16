@@ -1,12 +1,12 @@
 import { ConvexError, v } from "convex/values";
-import { mutationWithAuth, queryWithAuth } from "@convex-dev/convex-lucia-auth";
+import { mutationWithAuth } from "@convex-dev/convex-lucia-auth";
 import { query } from "./_generated/server";
 
 export const generateUploadUrl = mutationWithAuth({
   args: {
     // ...
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx) => {
     // use `args` and/or `ctx.auth` to authorize the user
     if (!ctx.session || !ctx.session.user) {
       throw new ConvexError({

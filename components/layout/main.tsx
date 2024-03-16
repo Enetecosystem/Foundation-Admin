@@ -1,6 +1,5 @@
 "use client";
 
-import { Code } from "@/components/typography/code";
 import { Link } from "@/components/typography/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

@@ -1,5 +1,4 @@
 import { queryWithAuth } from "@convex-dev/convex-lucia-auth";
-import { query } from "./_generated/server";
 
 export const dashboardData = queryWithAuth({
   args: {},
@@ -19,4 +18,16 @@ export const dashboardData = queryWithAuth({
 
     return { totalMined, totalXp, totalReferrals, totalUsers, recentUsers };
   },
+});
+
+export const fetchUsers = queryWithAuth({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("user").collect();
+  },
+});
+
+export const fetchTasks = queryWithAuth({
+  args: {},
+  handler: async (ctx) => await ctx.db.query("tasks").collect(),
 });

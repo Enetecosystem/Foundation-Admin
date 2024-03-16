@@ -42,5 +42,15 @@ module.exports = {
     // Allow async functions without await
     // for consistency (esp. Convex `handler`s)
     "@typescript-eslint/require-await": "off",
+
+    // Turn of function return error
+    "@typescript-eslint/no-misused-promises": [
+      2,
+      {
+        checksVoidReturn: {
+          attributes: false,
+        },
+      },
+    ],
   },
 };
