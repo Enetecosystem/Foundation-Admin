@@ -22,7 +22,6 @@ import {
   useSignOut,
   useSignUpSignIn,
 } from "@convex-dev/convex-lucia-auth/react";
-import { useMutation } from "convex/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React from "react";
 
@@ -62,7 +61,14 @@ function SignedIn({ children }: { children: React.ReactNode }) {
   return (
     <>
       <StickyHeader className="container flex h-[3.25rem] grid-cols-[240px_minmax(0,1fr)] items-center justify-between p-2 sm:grid">
-        <div></div>
+        <div className="px-6">
+          <Link
+            href={`/`}
+            className="hover:text-primary text-sm font-medium transition-colors"
+          >
+            Home
+          </Link>
+        </div>
         <div className="container">
           <SignOutButton />
         </div>

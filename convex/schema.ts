@@ -48,6 +48,11 @@ export default defineSchema(
       extra: v.optional(v.string()),
       type: v.union(v.literal("xp"), v.literal("rank")),
     }),
+    ads: defineTable({
+      link: v.string(),
+      storageId: v.id("_storage"),
+      expiresAt: v.optional(v.number()),
+    }),
   },
   // If you ever get an error about schema mismatch
   // between your data and your schema, and you cannot
