@@ -1,6 +1,6 @@
 import { FakeParagraphs } from "@/components/helpers/FakeParagraphs";
 import { FakeWordList } from "@/components/helpers/FakeWordList";
-import { Footer } from "@/components/layout/footer";
+import { StickyFooter } from "@/components/layout/sticky-footer";
 import { Paragraph } from "@/components/layout/paragraph";
 import { ResponsiveSidebarButton } from "@/components/layout/responsive-sidebar-button";
 import { StickyHeader } from "@/components/layout/sticky-header";
@@ -19,24 +19,26 @@ export default function Layout() {
   );
   return (
     <>
-      <StickyHeader className="p-2 flex items-center justify-between h-[3.25rem]">
+      <StickyHeader className="flex h-[3.25rem] items-center justify-between p-2">
         Sticky header
         <ResponsiveSidebarButton className="sm:hidden">
-          <div className="sm:hidden fixed bg-background w-screen top-[calc(3.25rem+1px)] h-[calc(100vh-(3.25rem+1px))]">
+          <div className="bg-background fixed top-[calc(3.25rem+1px)] h-[calc(100vh-(3.25rem+1px))] w-screen sm:hidden">
             <ScrollArea className="h-full">{sidebar}</ScrollArea>
           </div>
         </ResponsiveSidebarButton>
       </StickyHeader>
-      <div className="container sm:grid grid-cols-[240px_minmax(0,1fr)]">
-        <StickySidebar className="hidden sm:block top-[calc(3.25rem+1px)] h-[calc(100vh-(3.25rem+1px))]">
+      <div className="container grid-cols-[240px_minmax(0,1fr)] sm:grid">
+        <StickySidebar className="top-[calc(3.25rem+1px)] hidden h-[calc(100vh-(3.25rem+1px))] sm:block">
           {sidebar}
         </StickySidebar>
         <main className="min-h-[calc(100vh-(3.25rem+1px))]">
           <Paragraph>Main content</Paragraph>
-          <FakeParagraphs words={80} count={5} />
+          <FakeParagraphs words={80} count={15} />
         </main>
       </div>
-      <Footer>Footer below fold</Footer>
+      <StickyFooter>
+        Footer below fold | Should contain some metadata
+      </StickyFooter>
     </>
   );
 }
