@@ -1,4 +1,4 @@
-# Convex + TypeScript + Next.js + Lucia + Tailwind + shadcn/ui
+# Enet Miner admin dashboard
 
 This template provides a minimal setup to get Convex working with [Next.js](https://nextjs.org/). It uses [Lucia](https://lucia-auth.com/) for user authentication.
 
