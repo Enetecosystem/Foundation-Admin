@@ -44,12 +44,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   filterVisible?: boolean;
+  extra?: React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   filterVisible = true,
+  extra,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -91,6 +93,7 @@ export function DataTable<TData, TValue>({
             className="max-w-sm"
           />
         )}
+        {!filterVisible && extra && extra}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
