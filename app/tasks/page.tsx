@@ -137,8 +137,8 @@ export default function Tasks() {
 
         return (
           <div className="flex items-center gap-2 lowercase">
-            {getIcon(action?.socialNetwork)}
-            {action?.socialNetwork}
+            {getIcon(action?.channel)}
+            {action?.channel}
           </div>
         );
       },
@@ -351,7 +351,7 @@ export default function Tasks() {
                             name,
                             reward,
                             action: {
-                              socialNetwork: network,
+                              channel: network,
                               link,
                               type: actionType,
                             },
@@ -397,7 +397,7 @@ function EditableTaskDialog({ task, open, onOpenChange }: IEditableTaskProps) {
     if (task) {
       setEditableName(task?.name);
       setEditableReward(task?.reward);
-      setEditableNetwork(task?.action?.socialNetwork);
+      setEditableNetwork(task?.action?.channel);
       setEditableActionType(task?.action?.type);
       setEditableLink(task?.action?.link);
     }
@@ -407,7 +407,7 @@ function EditableTaskDialog({ task, open, onOpenChange }: IEditableTaskProps) {
     <Dialog open={open} onOpenChange={onOpenChange} key={task?._id}>
       {/* <DialogTrigger asChild>{children}</DialogTrigger> */}
       <DialogContent>
-        <DialogTitle>Edit a new task</DialogTitle>
+        <DialogTitle>Edit task</DialogTitle>
         <div className="grid w-full items-center justify-start gap-2">
           <div>
             <Label htmlFor="task_name">Task Name</Label>
@@ -532,7 +532,7 @@ function EditableTaskDialog({ task, open, onOpenChange }: IEditableTaskProps) {
                   name: nameEditable,
                   reward: rewardEditable,
                   action: {
-                    socialNetwork: networkEditable,
+                    channel: networkEditable,
                     link: linkEditable,
                     type: actionTypeEditable,
                   },

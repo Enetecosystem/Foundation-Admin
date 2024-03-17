@@ -46,21 +46,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type EventType = Doc<"events"> & { company: Doc<"company"> };
+type EventType = Doc<"events">;
 type Network = "twitter" | "discord" | "telegram" | "website";
 type ActionType = "follow" | "post" | "join" | "visit";
 
 export default function Events() {
   const events = useQueryWithAuth(api.queries.fetchEvents, {});
   const deleteEvent = useMutationWithAuth(api.mutations.deleteEventWithId);
-  const createEvent = useMutationWithAuth(api.mutations.createEvent);
-
-  // Add task state
-  const [name, setName] = useState("");
-  const [reward, setReward] = useState(0);
-  const [network, setNetwork] = useState<Network>("twitter");
-  const [actionType, setActionType] = useState<ActionType>("follow");
-  const [link, setLink] = useState("");
 
   // Editable modal open state
   const [open, setOpen] = useState<boolean>(false);
@@ -74,112 +66,112 @@ export default function Events() {
     }
   }, [editableEvent]);
 
-  // const columns: ColumnDef<EventType>[] = [
-  //   {
-  //     id: "select",
-  //     header: ({ table }) => (
-  //       <Checkbox
-  //         checked={
-  //           table.getIsAllPageRowsSelected() ||
-  //           (table.getIsSomePageRowsSelected() && "indeterminate")
-  //         }
-  //         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //         aria-label="Select all"
-  //       />
-  //     ),
-  //     cell: ({ row }) => (
-  //       <Checkbox
-  //         checked={row.getIsSelected()}
-  //         onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //         aria-label="Select row"
-  //       />
-  //     ),
-  //     enableSorting: false,
-  //     enableHiding: false,
-  //   },
-  //   {
-  //     accessorKey: "name",
-  //     header: "Name",
-  //     cell: ({ row }) => (
-  //       <div className="capitalize">{row.getValue("name")}</div>
-  //     ),
-  //   },
-  //   {
-  //     accessorKey: "reward",
-  //     header: "Reward",
-  //     cell: ({ row }) => {
-  //       const reward: number = row.getValue("reward");
-  //       return (
-  //         <div className="uppercase">XP {reward.toLocaleString("en-US")}</div>
-  //       );
-  //     },
-  //   },
-  //   {
-  //     accessorKey: "company",
-  //     accessorFn: (ogRow, index) => ogRow.company,
-  //     header: "Company",
-  //     cell: ({ row }) => {
-  //       // const action = row.getValue("action");
-  //       const event = row.original;
+  const columns: ColumnDef<EventType>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "name",
+      header: "Name",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("name")}</div>
+      ),
+    },
+    {
+      accessorKey: "reward",
+      header: "Reward",
+      cell: ({ row }) => {
+        const reward: number = row.getValue("reward");
+        return (
+          <div className="uppercase">XP {reward.toLocaleString("en-US")}</div>
+        );
+      },
+    },
+    // {
+    //   accessorKey: "company",
+    //   accessorFn: (ogRow, index) => ogRow.company,
+    //   header: "Company",
+    //   cell: ({ row }) => {
+    //     // const action = row.getValue("action");
+    //     const event = row.original;
 
-  //       const getIcon = (url: string) => {
-  //         return <img src={url} width={20} height={20} />;
-  //       };
+    //     const getIcon = (url: string) => {
+    //       return <img src={url} width={20} height={20} />;
+    //     };
 
-  //       return (
-  //         <div className="flex items-center gap-2 capitalize">
-  //           {getIcon(event?.company.logoUrl)}
-  //           {event?.company.name}
-  //         </div>
-  //       );
-  //     },
-  //   },
+    //     return (
+    //       <div className="flex items-center gap-2 capitalize">
+    //         {getIcon(event?.company.logoUrl)}
+    //         {event?.company.name}
+    //       </div>
+    //     );
+    //   },
+    // },
 
-  //   {
-  //     id: "actions",
-  //     enableHiding: false,
-  //     cell: ({ row }) => {
-  //       const event = row.original;
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row }) => {
+        const event = row.original;
 
-  //       return (
-  //         <>
-  //           <DropdownMenu>
-  //             <DropdownMenuTrigger asChild>
-  //               <Button variant="ghost" className="h-8 w-8 p-0">
-  //                 <span className="sr-only">Open menu</span>
-  //                 <DotsHorizontalIcon className="h-4 w-4" />
-  //               </Button>
-  //             </DropdownMenuTrigger>
-  //             <DropdownMenuContent align="end">
-  //               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-  //               <DropdownMenuSeparator />
+        return (
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <DotsHorizontalIcon className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
 
-  //               <DropdownMenuItem
-  //                 className="mb-1 hover:cursor-pointer"
-  //                 onClick={() => {
-  //                   // setEditableTaskIndex(row.index);
-  //                   setEditableEvent(event);
-  //                 }}
-  //               >
-  //                 Edit event
-  //               </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="mb-1 hover:cursor-pointer"
+                  onClick={() => {
+                    // setEditableTaskIndex(row.index);
+                    setEditableEvent(event);
+                  }}
+                >
+                  Edit event
+                </DropdownMenuItem>
 
-  //               {/* <DropdownMenuItem>View customer</DropdownMenuItem> */}
-  //               <DropdownMenuItem
-  //                 className="bg-red-500 hover:cursor-pointer"
-  //                 onClick={async () => {
-  //                   await deleteEvent({ eventId: event._id });
-  //                 }}
-  //               >
-  //                 Delete event
-  //               </DropdownMenuItem>
-  //             </DropdownMenuContent>
-  //           </DropdownMenu>
-  //         </>
-  //       );
-  //     },
-  //   },
-  // ];
+                {/* <DropdownMenuItem>View customer</DropdownMenuItem> */}
+                <DropdownMenuItem
+                  className="bg-red-500 hover:cursor-pointer"
+                  onClick={async () => {
+                    await deleteEvent({ eventId: event._id });
+                  }}
+                >
+                  Delete event
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
+        );
+      },
+    },
+  ];
 
   return (
     <MainLayout>
@@ -194,171 +186,18 @@ export default function Events() {
               </p>
             </div>
           </div>
-          {/* <DataTable
+          <DataTable
             filterVisible={false}
             data={events ?? []}
             columns={columns}
             extra={
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button className="gap-1">
-                    <PlusIcon className="h-4 w-4 font-bold" /> Add event
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogTitle>Create a new task</DialogTitle>
-                  <div className="grid w-full items-center justify-start gap-2">
-                    <div>
-                      <Label htmlFor="task_name">Task Name</Label>
-                      <Input
-                        name="task_name"
-                        id="task_name"
-                        placeholder="Task name"
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                        className="max-w-sm"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="reward">Reward</Label>
-                      <Input
-                        name="reward"
-                        id="reward"
-                        type="number"
-                        placeholder="Reward"
-                        value={reward}
-                        onChange={(event) =>
-                          setReward(event.target.valueAsNumber)
-                        }
-                        className="max-w-sm"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="socials">Social Network</Label>
-                      <ToggleGroup
-                        id="socials"
-                        type="single"
-                        className="justify-start"
-                        defaultValue={network}
-                        value={network}
-                        onValueChange={(value: Network) => {
-                          setNetwork(value);
-                          switch (value) {
-                            case "twitter" as Network:
-                              setActionType("follow");
-                              break;
-                            case "discord" as Network:
-                            case "telegram" as Network:
-                              setActionType("join");
-                              break;
-                            case "website" as Network:
-                              setActionType("visit");
-                              break;
-                            default:
-                              setActionType("follow");
-                              break;
-                          }
-                        }}
-                      >
-                        <ToggleGroupItem
-                          value="twitter"
-                          aria-label="Toggle twitter"
-                        >
-                          <FaXTwitter className="h-4 w-4" />
-                        </ToggleGroupItem>
-                        <ToggleGroupItem
-                          value="discord"
-                          aria-label="Toggle discord"
-                        >
-                          <FaDiscord className="h-4 w-4" />
-                        </ToggleGroupItem>
-                        <ToggleGroupItem
-                          value="telegram"
-                          aria-label="Toggle telegram"
-                        >
-                          <FaTelegram className="h-4 w-4" />
-                        </ToggleGroupItem>
-                        <ToggleGroupItem
-                          value="website"
-                          aria-label="Toggle website"
-                        >
-                          <FaGlobe className="h-4 w-4" />
-                        </ToggleGroupItem>
-                      </ToggleGroup>
-                    </div>
-                    <div>
-                      <Label htmlFor="type">Select action type</Label>
-                      <Select
-                        name="type"
-                        value={actionType}
-                        onValueChange={(value: ActionType) =>
-                          setActionType(value)
-                        }
-                      >
-                        <SelectTrigger className="max-w-sm">
-                          <SelectValue placeholder="Select a action type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>Type</SelectLabel>
-                            {network === "twitter" && (
-                              <SelectItem value="follow">Follow</SelectItem>
-                            )}
-                            {network === "twitter" && (
-                              <SelectItem value="post">Post</SelectItem>
-                            )}
-                            {(network === "discord" ||
-                              network === "telegram") && (
-                              <SelectItem value="join">Join</SelectItem>
-                            )}
-                            {network === "website" && (
-                              <SelectItem value="visit">Visit</SelectItem>
-                            )}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="link">
-                        {network === "twitter" ? "Twitter entity" : "Link"}
-                      </Label>
-                      <Input
-                        name="link"
-                        id="link"
-                        placeholder={
-                          network === "twitter"
-                            ? "Entity handle or URL"
-                            : `${network} Link`
-                        }
-                        value={link}
-                        onChange={(event) => setLink(event.target.value)}
-                        className="max-w-sm"
-                      />
-                    </div>
-                    <DialogClose asChild>
-                      <Button
-                        onClick={async () => {
-                          // await addTask({
-                          //   name,
-                          //   reward,
-                          //   action: {
-                          //     socialNetwork: network,
-                          //     link,
-                          //     type: actionType,
-                          //   },
-                          // });
-                        }}
-                      >
-                        Create
-                      </Button>
-                    </DialogClose>
-                  </div>
-                </DialogContent>
-              </Dialog>
+              <Button className="gap-1" onClick={() => setOpen(true)}>
+                <PlusIcon className="h-4 w-4 font-bold" /> Add event
+              </Button>
             }
-          /> */}
+          />
         </div>
-        <EditableTaskDialog
+        <EventDialog
           open={open}
           event={editableEvent}
           onOpenChange={(open) => setOpen(open)}
@@ -368,46 +207,86 @@ export default function Events() {
   );
 }
 
-interface IEditableTaskProps {
+interface IEventDialogProps {
+  children?: React.ReactNode;
   event: Doc<"events"> | undefined | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-function EditableTaskDialog({ event, open, onOpenChange }: IEditableTaskProps) {
+function EventDialog({
+  children,
+  event,
+  open,
+  onOpenChange,
+}: IEventDialogProps) {
   // Add task state
-  const [nameEditable, setEditableName] = useState("");
-  const [rewardEditable, setEditableReward] = useState(0);
-  const [networkEditable, setEditableNetwork] = useState<Network>("twitter");
-  const [actionTypeEditable, setEditableActionType] =
-    useState<ActionType>("follow");
-  const [linkEditable, setEditableLink] = useState("");
+  const [title, setTitle] = useState("");
+  const [reward, setReward] = useState(0);
+  const [companyId, setCompanyId] = useState<Id<"company">>();
+  const [actions, setActions] = useState<
+    { name: string; link: string; channel: Network; type: ActionType }[]
+  >([]);
 
   const updateEvent = useMutationWithAuth(api.mutations.updateEvent);
+  const createEvent = useMutationWithAuth(api.mutations.createEvent);
+  const getCompanies = useQueryWithAuth(api.queries.fetchCompanies, {});
 
   useEffect(() => {
     if (event) {
-      setEditableName(event?.title);
-      setEditableReward(event?.reward);
-      // setEditableNetwork(event?.action?.socialNetwork);
-      // setEditableActionType(event?.action?.type);
-      // setEditableLink(event?.action?.link);
+      setTitle(event?.title);
+      setReward(event?.reward);
+      setCompanyId(event?.companyId);
+      setActions(event?.actions);
     }
   }, [event]);
 
+  // Action array dsipatch handler
+  function set(key: string, at: number, value: any) {
+    const newActions = actions?.map((action, i) => {
+      if (i === at) {
+        return {
+          ...action,
+          [key]: value,
+          ...(key === "channel" && {
+            type: (value === "website"
+              ? "visit"
+              : value === "twitter"
+                ? "follow"
+                : "join") as ActionType,
+          }),
+        };
+      } else {
+        return action;
+      }
+    });
+
+    setActions(newActions);
+  }
+
+  // company dialog controls
+  const [openCompanyDialog, setOpenCompanyDialog] = useState(false);
+  useEffect(() => {
+    if (companyId === "new") {
+      setOpenCompanyDialog(true);
+    }
+  }, [companyId]);
+
+  useEffect(() => console.log(actions), [actions]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange} key={event?._id}>
-      {/* <DialogTrigger asChild>{children}</DialogTrigger> */}
+      {children && <DialogTrigger asChild>{children}</DialogTrigger>}
       <DialogContent>
-        <DialogTitle>Edit a new task</DialogTitle>
+        <DialogTitle>{event ? "Edit event" : "Create a new event"}</DialogTitle>
         <div className="grid w-full items-center justify-start gap-2">
           <div>
-            <Label htmlFor="task_name">Task Name</Label>
+            <Label htmlFor="title">Event Title</Label>
             <Input
-              name="task_name"
-              id="task_name"
-              placeholder="Task name"
-              value={nameEditable}
-              onChange={(event) => setEditableName(event.target.value)}
+              name="title"
+              id="title"
+              placeholder="Title"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
               className="max-w-sm"
             />
           </div>
@@ -418,122 +297,250 @@ function EditableTaskDialog({ event, open, onOpenChange }: IEditableTaskProps) {
               id="reward"
               type="number"
               placeholder="Reward"
-              value={rewardEditable}
-              onChange={(event) =>
-                setEditableReward(event.target.valueAsNumber)
-              }
+              value={reward}
+              onChange={(event) => setReward(event.target.valueAsNumber)}
               className="max-w-sm"
             />
           </div>
           <div>
-            <Label htmlFor="socials">Social Network</Label>
-            <ToggleGroup
-              id="socials"
-              type="single"
-              className="justify-start"
-              defaultValue={networkEditable}
-              value={networkEditable}
-              onValueChange={(value: Network) => {
-                setEditableNetwork(value);
-                switch (value) {
-                  case "twitter":
-                    setEditableActionType("follow");
-                    break;
-                  case "discord":
-                  case "telegram":
-                    setEditableActionType("join");
-                    break;
-                  case "website":
-                    setEditableActionType("visit");
-                    break;
-                  default:
-                    setEditableActionType("follow");
-                    break;
-                }
-              }}
-            >
-              <ToggleGroupItem value="twitter" aria-label="Toggle twitter">
-                <FaXTwitter className="h-4 w-4" />
-              </ToggleGroupItem>
-              <ToggleGroupItem value="discord" aria-label="Toggle discord">
-                <FaDiscord className="h-4 w-4" />
-              </ToggleGroupItem>
-              <ToggleGroupItem value="telegram" aria-label="Toggle telegram">
-                <FaTelegram className="h-4 w-4" />
-              </ToggleGroupItem>
-              <ToggleGroupItem value="website" aria-label="Toggle website">
-                <FaGlobe className="h-4 w-4" />
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </div>
-          <div>
-            <Label htmlFor="type">Select action type</Label>
+            <Label htmlFor="type">Select company</Label>
             <Select
               name="type"
-              value={actionTypeEditable}
-              onValueChange={(value: ActionType) =>
-                setEditableActionType(value)
-              }
+              value={companyId}
+              onValueChange={(value: Id<"company">) => {
+                setCompanyId(value);
+              }}
             >
               <SelectTrigger className="max-w-sm">
-                <SelectValue placeholder="Select a action type" />
+                <SelectValue placeholder="Select a company" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectLabel>Type</SelectLabel>
-                  {networkEditable === "twitter" && (
-                    <SelectItem value="follow">Follow</SelectItem>
-                  )}
-                  {networkEditable === "twitter" && (
-                    <SelectItem value="post">Post</SelectItem>
-                  )}
-                  {(networkEditable === "discord" ||
-                    networkEditable === "telegram") && (
-                    <SelectItem value="join">Join</SelectItem>
-                  )}
-                  {networkEditable === "website" && (
-                    <SelectItem value="visit">Visit</SelectItem>
-                  )}
+                  <SelectLabel>Companies</SelectLabel>
+                  {getCompanies?.map((company) => (
+                    <SelectItem
+                      disabled={!company?.isApproved}
+                      key={company?._id}
+                      value={company?._id}
+                    >
+                      {company?.name}
+                    </SelectItem>
+                  ))}
+
+                  {/* Launch another modal and create new company, then return here and select it */}
+
+                  <SelectItem value="new">Creat new company</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
           </div>
-          <div>
-            <Label htmlFor="link">
-              {networkEditable === "twitter" ? "Twitter entity" : "Link"}
-            </Label>
-            <Input
-              name="link"
-              id="link"
-              placeholder={
-                networkEditable === "twitter"
-                  ? "Entity handle or URL"
-                  : `${networkEditable} Link`
-              }
-              value={linkEditable}
-              onChange={(event) => setEditableLink(event.target.value)}
-              className="max-w-sm"
-            />
+          <div className="grid w-full gap-2">
+            <div className="flex items-center justify-between">
+              <h1 className="font-medium">Actions</h1>
+              <Button
+                size="sm"
+                onClick={() => {
+                  setActions([
+                    ...actions,
+                    { name: "", link: "", channel: "discord", type: "join" },
+                  ]);
+                }}
+              >
+                Add action
+              </Button>
+            </div>
+            {actions?.map((action, index) => {
+              return (
+                <div
+                  key={index}
+                  className="grid grid-cols-2 gap-3 rounded-lg border border-gray-600 p-3"
+                >
+                  <div>
+                    <Label htmlFor="name">Action name</Label>
+                    <Input
+                      id="name"
+                      placeholder="Enter name"
+                      value={action?.name}
+                      onChange={(e) => set("name", index, e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="socials">Channel</Label>
+                    <ToggleGroup
+                      id="socials"
+                      type="single"
+                      className="justify-start"
+                      // defaultValue={action?.channel}
+                      value={action?.channel}
+                      onValueChange={(value: Network) => {
+                        console.log(value, ":::Network");
+                        // switch (value) {
+                        //   case "twitter":
+                        //     set("type", index, "follow");
+                        //     break;
+                        //   case "discord":
+                        //   case "telegram":
+                        //     set("type", index, "join");
+                        //     break;
+                        //   case "website":
+                        //     set("type", index, "visit");
+                        //     break;
+                        //   default:
+                        //     set("type", index, "follow");
+                        //     break;
+                        // }
+                        set("channel", index, value);
+                      }}
+                    >
+                      <ToggleGroupItem
+                        value="twitter"
+                        aria-label="Toggle twitter"
+                      >
+                        <FaXTwitter className="h-4 w-4" />
+                      </ToggleGroupItem>
+                      <ToggleGroupItem
+                        value="discord"
+                        aria-label="Toggle discord"
+                      >
+                        <FaDiscord className="h-4 w-4" />
+                      </ToggleGroupItem>
+                      <ToggleGroupItem
+                        value="telegram"
+                        aria-label="Toggle telegram"
+                      >
+                        <FaTelegram className="h-4 w-4" />
+                      </ToggleGroupItem>
+                      <ToggleGroupItem
+                        value="website"
+                        aria-label="Toggle website"
+                      >
+                        <FaGlobe className="h-4 w-4" />
+                      </ToggleGroupItem>
+                    </ToggleGroup>
+                  </div>
+                  <div>
+                    <Label htmlFor="type">Select action type</Label>
+                    <Select
+                      name="type"
+                      value={action?.type}
+                      onValueChange={(value: ActionType) =>
+                        set("type", index, value)
+                      }
+                    >
+                      <SelectTrigger className="max-w-sm">
+                        <SelectValue placeholder="Select a action type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Type</SelectLabel>
+                          {action?.channel === "twitter" && (
+                            <SelectItem value="follow">Follow</SelectItem>
+                          )}
+                          {action?.channel === "twitter" && (
+                            <SelectItem value="post">Post</SelectItem>
+                          )}
+                          {(action?.channel === "discord" ||
+                            action?.channel === "telegram") && (
+                            <SelectItem value="join">Join</SelectItem>
+                          )}
+                          {action?.channel === "website" && (
+                            <SelectItem value="visit">Visit</SelectItem>
+                          )}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="link">
+                      {action?.channel === "twitter"
+                        ? "Twitter entity"
+                        : "Link"}
+                    </Label>
+                    <Input
+                      name="link"
+                      id="link"
+                      placeholder={
+                        action?.channel === "twitter"
+                          ? "Entity handle or URL"
+                          : `${action?.channel} Link`
+                      }
+                      value={action?.link}
+                      onChange={(event) =>
+                        set("link", index, event.target.value)
+                      }
+                      className="max-w-sm"
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
           <DialogClose asChild>
             <Button
               onClick={async () => {
-                // await updateEvent({
-                //   eventId: event?._id as Id<"events">,
-                //   title: nameEditable,
-                //   reward: rewardEditable,
-                //   action: {
-                //     socialNetwork: networkEditable,
-                //     link: linkEditable,
-                //     type: actionTypeEditable,
-                //   },
-                // });
+                if (event) {
+                  await updateEvent({
+                    eventId: event?._id as Id<"events">,
+                    title,
+                    reward,
+                    companyId: companyId as Id<"company">,
+                    actions: actions
+                      ? actions.map(({ name, link, type, channel }) => ({
+                          name,
+                          link,
+                          type,
+                          channel,
+                        }))
+                      : [],
+                  });
+                } else {
+                  if (!actions?.length) {
+                    return alert("At least 1 action must be given");
+                  }
+
+                  await createEvent({
+                    title,
+                    reward,
+                    companyId: companyId as Id<"company">,
+                    actions: actions.map(({ name, link, type, channel }) => ({
+                      name,
+                      link,
+                      type,
+                      channel,
+                    })),
+                  });
+                }
               }}
             >
-              Update
+              {event ? "Update" : "Create"}
             </Button>
           </DialogClose>
         </div>
+      </DialogContent>
+      <CompanyCreateDialog
+        open={openCompanyDialog}
+        onOpenChange={(open) => setOpenCompanyDialog(open)}
+      />
+    </Dialog>
+  );
+}
+
+interface ICompanyDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  // children: React.ReactNode;
+}
+function CompanyCreateDialog({
+  open,
+  onOpenChange,
+  // children,
+}: ICompanyDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {/* <DialogTrigger asChild>{children}</DialogTrigger>/ */}
+      <DialogContent>
+        <DialogTitle>Create a new company</DialogTitle>
+        <div className="grid w-full items-center justify-start gap-2"></div>
       </DialogContent>
     </Dialog>
   );
