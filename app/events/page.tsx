@@ -74,112 +74,112 @@ export default function Events() {
     }
   }, [editableEvent]);
 
-  const columns: ColumnDef<EventType>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "name",
-      header: "Name",
-      cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("name")}</div>
-      ),
-    },
-    {
-      accessorKey: "reward",
-      header: "Reward",
-      cell: ({ row }) => {
-        const reward: number = row.getValue("reward");
-        return (
-          <div className="uppercase">XP {reward.toLocaleString("en-US")}</div>
-        );
-      },
-    },
-    {
-      accessorKey: "company",
-      accessorFn: (ogRow, index) => ogRow.company,
-      header: "Company",
-      cell: ({ row }) => {
-        // const action = row.getValue("action");
-        const event = row.original;
+  // const columns: ColumnDef<EventType>[] = [
+  //   {
+  //     id: "select",
+  //     header: ({ table }) => (
+  //       <Checkbox
+  //         checked={
+  //           table.getIsAllPageRowsSelected() ||
+  //           (table.getIsSomePageRowsSelected() && "indeterminate")
+  //         }
+  //         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+  //         aria-label="Select all"
+  //       />
+  //     ),
+  //     cell: ({ row }) => (
+  //       <Checkbox
+  //         checked={row.getIsSelected()}
+  //         onCheckedChange={(value) => row.toggleSelected(!!value)}
+  //         aria-label="Select row"
+  //       />
+  //     ),
+  //     enableSorting: false,
+  //     enableHiding: false,
+  //   },
+  //   {
+  //     accessorKey: "name",
+  //     header: "Name",
+  //     cell: ({ row }) => (
+  //       <div className="capitalize">{row.getValue("name")}</div>
+  //     ),
+  //   },
+  //   {
+  //     accessorKey: "reward",
+  //     header: "Reward",
+  //     cell: ({ row }) => {
+  //       const reward: number = row.getValue("reward");
+  //       return (
+  //         <div className="uppercase">XP {reward.toLocaleString("en-US")}</div>
+  //       );
+  //     },
+  //   },
+  //   {
+  //     accessorKey: "company",
+  //     accessorFn: (ogRow, index) => ogRow.company,
+  //     header: "Company",
+  //     cell: ({ row }) => {
+  //       // const action = row.getValue("action");
+  //       const event = row.original;
 
-        const getIcon = (url: string) => {
-          return <img src={url} width={20} height={20} />;
-        };
+  //       const getIcon = (url: string) => {
+  //         return <img src={url} width={20} height={20} />;
+  //       };
 
-        return (
-          <div className="flex items-center gap-2 capitalize">
-            {getIcon(event?.company.logoUrl)}
-            {event?.company.name}
-          </div>
-        );
-      },
-    },
+  //       return (
+  //         <div className="flex items-center gap-2 capitalize">
+  //           {getIcon(event?.company.logoUrl)}
+  //           {event?.company.name}
+  //         </div>
+  //       );
+  //     },
+  //   },
 
-    {
-      id: "actions",
-      enableHiding: false,
-      cell: ({ row }) => {
-        const event = row.original;
+  //   {
+  //     id: "actions",
+  //     enableHiding: false,
+  //     cell: ({ row }) => {
+  //       const event = row.original;
 
-        return (
-          <>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <DotsHorizontalIcon className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuSeparator />
+  //       return (
+  //         <>
+  //           <DropdownMenu>
+  //             <DropdownMenuTrigger asChild>
+  //               <Button variant="ghost" className="h-8 w-8 p-0">
+  //                 <span className="sr-only">Open menu</span>
+  //                 <DotsHorizontalIcon className="h-4 w-4" />
+  //               </Button>
+  //             </DropdownMenuTrigger>
+  //             <DropdownMenuContent align="end">
+  //               <DropdownMenuLabel>Actions</DropdownMenuLabel>
+  //               <DropdownMenuSeparator />
 
-                <DropdownMenuItem
-                  className="mb-1 hover:cursor-pointer"
-                  onClick={() => {
-                    // setEditableTaskIndex(row.index);
-                    setEditableEvent(event);
-                  }}
-                >
-                  Edit event
-                </DropdownMenuItem>
+  //               <DropdownMenuItem
+  //                 className="mb-1 hover:cursor-pointer"
+  //                 onClick={() => {
+  //                   // setEditableTaskIndex(row.index);
+  //                   setEditableEvent(event);
+  //                 }}
+  //               >
+  //                 Edit event
+  //               </DropdownMenuItem>
 
-                {/* <DropdownMenuItem>View customer</DropdownMenuItem> */}
-                <DropdownMenuItem
-                  className="bg-red-500 hover:cursor-pointer"
-                  onClick={async () => {
-                    await deleteEvent({ eventId: event._id });
-                  }}
-                >
-                  Delete event
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        );
-      },
-    },
-  ];
+  //               {/* <DropdownMenuItem>View customer</DropdownMenuItem> */}
+  //               <DropdownMenuItem
+  //                 className="bg-red-500 hover:cursor-pointer"
+  //                 onClick={async () => {
+  //                   await deleteEvent({ eventId: event._id });
+  //                 }}
+  //               >
+  //                 Delete event
+  //               </DropdownMenuItem>
+  //             </DropdownMenuContent>
+  //           </DropdownMenu>
+  //         </>
+  //       );
+  //     },
+  //   },
+  // ];
 
   return (
     <MainLayout>
@@ -194,7 +194,7 @@ export default function Events() {
               </p>
             </div>
           </div>
-          <DataTable
+          {/* <DataTable
             filterVisible={false}
             data={events ?? []}
             columns={columns}
@@ -338,15 +338,15 @@ export default function Events() {
                     <DialogClose asChild>
                       <Button
                         onClick={async () => {
-                          await addTask({
-                            name,
-                            reward,
-                            action: {
-                              socialNetwork: network,
-                              link,
-                              type: actionType,
-                            },
-                          });
+                          // await addTask({
+                          //   name,
+                          //   reward,
+                          //   action: {
+                          //     socialNetwork: network,
+                          //     link,
+                          //     type: actionType,
+                          //   },
+                          // });
                         }}
                       >
                         Create
@@ -356,11 +356,11 @@ export default function Events() {
                 </DialogContent>
               </Dialog>
             }
-          />
+          /> */}
         </div>
         <EditableTaskDialog
           open={open}
-          task={editableTask}
+          event={editableEvent}
           onOpenChange={(open) => setOpen(open)}
         />
       </div>
@@ -369,11 +369,11 @@ export default function Events() {
 }
 
 interface IEditableTaskProps {
-  task: Doc<"tasks"> | undefined | null;
+  event: Doc<"events"> | undefined | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-function EditableTaskDialog({ task, open, onOpenChange }: IEditableTaskProps) {
+function EditableTaskDialog({ event, open, onOpenChange }: IEditableTaskProps) {
   // Add task state
   const [nameEditable, setEditableName] = useState("");
   const [rewardEditable, setEditableReward] = useState(0);
@@ -382,20 +382,20 @@ function EditableTaskDialog({ task, open, onOpenChange }: IEditableTaskProps) {
     useState<ActionType>("follow");
   const [linkEditable, setEditableLink] = useState("");
 
-  const updateTask = useMutationWithAuth(api.mutations.updateTask);
+  const updateEvent = useMutationWithAuth(api.mutations.updateEvent);
 
   useEffect(() => {
-    if (task) {
-      setEditableName(task?.name);
-      setEditableReward(task?.reward);
-      setEditableNetwork(task?.action?.socialNetwork);
-      setEditableActionType(task?.action?.type);
-      setEditableLink(task?.action?.link);
+    if (event) {
+      setEditableName(event?.title);
+      setEditableReward(event?.reward);
+      // setEditableNetwork(event?.action?.socialNetwork);
+      // setEditableActionType(event?.action?.type);
+      // setEditableLink(event?.action?.link);
     }
-  }, [task]);
+  }, [event]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} key={task?._id}>
+    <Dialog open={open} onOpenChange={onOpenChange} key={event?._id}>
       {/* <DialogTrigger asChild>{children}</DialogTrigger> */}
       <DialogContent>
         <DialogTitle>Edit a new task</DialogTitle>
@@ -518,16 +518,16 @@ function EditableTaskDialog({ task, open, onOpenChange }: IEditableTaskProps) {
           <DialogClose asChild>
             <Button
               onClick={async () => {
-                await updateTask({
-                  taskId: task?._id as Id<"tasks">,
-                  name: nameEditable,
-                  reward: rewardEditable,
-                  action: {
-                    socialNetwork: networkEditable,
-                    link: linkEditable,
-                    type: actionTypeEditable,
-                  },
-                });
+                // await updateEvent({
+                //   eventId: event?._id as Id<"events">,
+                //   title: nameEditable,
+                //   reward: rewardEditable,
+                //   action: {
+                //     socialNetwork: networkEditable,
+                //     link: linkEditable,
+                //     type: actionTypeEditable,
+                //   },
+                // });
               }}
             >
               Update
