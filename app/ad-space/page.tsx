@@ -92,7 +92,7 @@ export default function AdSpace() {
               }
             />
           </div>
-          <div className="flex">
+          <div className="flex rounded-2xl border border-gray-600/40 p-2">
             {bannerData && (
               <img
                 src={bannerData?.url ?? ""}

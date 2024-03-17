@@ -73,6 +73,34 @@ export default defineSchema(
         ),
       }),
     }),
+    events: defineTable({
+      title: v.string(),
+      reward: v.number(),
+      companyId: v.id("company"),
+      actions: v.array(
+        v.object({
+          name: v.string(),
+          link: v.string(),
+          type: v.union(
+            v.literal("visit"),
+            v.literal("follow"),
+            v.literal("post"),
+            v.literal("join"),
+          ),
+          socialNetwork: v.union(
+            v.literal("twitter"),
+            v.literal("telegram"),
+            v.literal("discord"),
+            v.literal("website"),
+          ),
+        }),
+      ),
+    }),
+    company: defineTable({
+      name: v.string(),
+      logoUrl: v.string(),
+      isApproved: v.boolean(),
+    }),
   },
   // If you ever get an error about schema mismatch
   // between your data and your schema, and you cannot

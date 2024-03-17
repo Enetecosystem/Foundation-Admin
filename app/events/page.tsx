@@ -46,14 +46,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type TaskType = Doc<"tasks">;
+type EventType = Doc<"events"> & { company: Doc<"company"> };
 type Network = "twitter" | "discord" | "telegram" | "website";
 type ActionType = "follow" | "post" | "join" | "visit";
 
-export default function Tasks() {
-  const tasks = useQueryWithAuth(api.queries.fetchTasks, {});
-  const deleteTask = useMutationWithAuth(api.mutations.deleteTaskWithId);
-  const addTask = useMutationWithAuth(api.mutations.addTask);
+export default function Events() {
+  const events = useQueryWithAuth(api.queries.fetchEvents, {});
+  const deleteEvent = useMutationWithAuth(api.mutations.deleteEventWithId);
+  const createEvent = useMutationWithAuth(api.mutations.createEvent);
 
   // Add task state
   const [name, setName] = useState("");
@@ -64,15 +64,17 @@ export default function Tasks() {
 
   // Editable modal open state
   const [open, setOpen] = useState<boolean>(false);
-  const [editableTask, setEditableTask] = useState<Doc<"tasks"> | null>(null);
+  const [editableEvent, setEditableEvent] = useState<Doc<"events"> | null>(
+    null,
+  );
 
   useEffect(() => {
-    if (editableTask) {
+    if (editableEvent) {
       setOpen(true);
     }
-  }, [editableTask]);
+  }, [editableEvent]);
 
-  const columns: ColumnDef<TaskType>[] = [
+  const columns: ColumnDef<EventType>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -113,32 +115,21 @@ export default function Tasks() {
       },
     },
     {
-      accessorKey: "socialNetwork",
-      header: "Social Network",
+      accessorKey: "company",
+      accessorFn: (ogRow, index) => ogRow.company,
+      header: "Company",
       cell: ({ row }) => {
         // const action = row.getValue("action");
-        const task = row.original;
-        const action = task.action;
+        const event = row.original;
 
-        const getIcon = (social: string) => {
-          switch (social) {
-            case "twitter":
-              return <FaXTwitter className="h-4 w-4" />;
-            case "discord":
-              return <FaDiscord className="h-4 w-4" />;
-            case "telegram":
-              return <FaTelegram className="h-4 w-4" />;
-            case "website":
-              return <FaGlobe className="h-4 w-4" />;
-            default:
-              return <FaGlobe className="h-4 w-4" />;
-          }
+        const getIcon = (url: string) => {
+          return <img src={url} width={20} height={20} />;
         };
 
         return (
-          <div className="flex items-center gap-2 lowercase">
-            {getIcon(action?.socialNetwork)}
-            {action?.socialNetwork}
+          <div className="flex items-center gap-2 capitalize">
+            {getIcon(event?.company.logoUrl)}
+            {event?.company.name}
           </div>
         );
       },
@@ -148,7 +139,7 @@ export default function Tasks() {
       id: "actions",
       enableHiding: false,
       cell: ({ row }) => {
-        const task = row.original;
+        const event = row.original;
 
         return (
           <>
@@ -167,20 +158,20 @@ export default function Tasks() {
                   className="mb-1 hover:cursor-pointer"
                   onClick={() => {
                     // setEditableTaskIndex(row.index);
-                    setEditableTask(task);
+                    setEditableEvent(event);
                   }}
                 >
-                  Edit task
+                  Edit event
                 </DropdownMenuItem>
 
                 {/* <DropdownMenuItem>View customer</DropdownMenuItem> */}
                 <DropdownMenuItem
                   className="bg-red-500 hover:cursor-pointer"
                   onClick={async () => {
-                    await deleteTask({ taskId: task._id });
+                    await deleteEvent({ eventId: event._id });
                   }}
                 >
-                  Delete task
+                  Delete event
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -196,22 +187,22 @@ export default function Tasks() {
         <div className="h-full w-full flex-1 flex-col space-y-8 p-8 md:flex">
           <div className="flex items-center justify-between space-y-2">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight">Tasks</h2>
+              <h2 className="text-2xl font-bold tracking-tight">Events</h2>
               <p className="text-muted-foreground">
-                Here&apos;s a list of all tasks that will show up in the mobile
+                Here&apos;s a list of all events that will show up in the mobile
                 app
               </p>
             </div>
           </div>
           <DataTable
             filterVisible={false}
-            data={tasks ?? []}
+            data={events ?? []}
             columns={columns}
             extra={
               <Dialog>
                 <DialogTrigger asChild>
                   <Button className="gap-1">
-                    <PlusIcon className="h-4 w-4 font-bold" /> Add task
+                    <PlusIcon className="h-4 w-4 font-bold" /> Add event
                   </Button>
                 </DialogTrigger>
                 <DialogContent>

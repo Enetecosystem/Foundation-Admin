@@ -27,7 +27,29 @@ export const fetchUsers = queryWithAuth({
   },
 });
 
+// Tasks
 export const fetchTasks = queryWithAuth({
   args: {},
   handler: async (ctx) => await ctx.db.query("tasks").collect(),
+});
+
+// Events
+export const fetchEvents = queryWithAuth({
+  args: {},
+  handler: async (ctx) => {
+    const events = await ctx.db.query("events").collect();
+
+    return await Promise.all(
+      events.map(async (event) => ({
+        ...event,
+        company: { ...(await ctx.db.get(event.companyId)) },
+      })),
+    );
+  },
+});
+
+// Company
+export const fetchCompanies = queryWithAuth({
+  args: {},
+  handler: async (ctx) => await ctx.db.query("company").collect(),
 });

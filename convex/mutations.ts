@@ -13,6 +13,7 @@ export const deleteUserWithId = mutationWithAuth({
   },
 });
 
+// Tasks
 export const deleteTaskWithId = mutationWithAuth({
   args: { taskId: v.id("tasks") },
   handler: async (ctx, args) => await ctx.db.delete(args.taskId),
@@ -72,5 +73,93 @@ export const updateTask = mutationWithAuth({
       name: args.name,
       reward: args.reward,
       action: args.action,
+    }),
+});
+
+// Events
+export const createEvent = mutationWithAuth({
+  args: {
+    title: v.string(),
+    reward: v.number(),
+    companyId: v.id("company"),
+    actions: v.array(
+      v.object({
+        name: v.string(),
+        link: v.string(),
+        type: v.union(
+          v.literal("visit"),
+          v.literal("follow"),
+          v.literal("post"),
+          v.literal("join"),
+        ),
+        socialNetwork: v.union(
+          v.literal("twitter"),
+          v.literal("telegram"),
+          v.literal("discord"),
+          v.literal("website"),
+        ),
+      }),
+    ),
+  },
+  handler: async (ctx, args) => await ctx.db.insert("events", { ...args }),
+});
+
+export const updateEvent = mutationWithAuth({
+  args: {
+    eventId: v.id("events"),
+    title: v.string(),
+    reward: v.number(),
+    companyId: v.id("company"),
+    actions: v.array(
+      v.object({
+        name: v.string(),
+        link: v.string(),
+        type: v.union(
+          v.literal("visit"),
+          v.literal("follow"),
+          v.literal("post"),
+          v.literal("join"),
+        ),
+        socialNetwork: v.union(
+          v.literal("twitter"),
+          v.literal("telegram"),
+          v.literal("discord"),
+          v.literal("website"),
+        ),
+      }),
+    ),
+  },
+  handler: async (ctx, args) =>
+    await ctx.db.replace(args.eventId, {
+      title: args.title,
+      reward: args.reward,
+      companyId: args.companyId,
+      actions: args.actions,
+    }),
+});
+
+export const deleteEventWithId = mutationWithAuth({
+  args: { eventId: v.id("events") },
+  handler: async (ctx, args) => await ctx.db.delete(args.eventId),
+});
+
+// Company
+export const createCompany = mutationWithAuth({
+  args: { name: v.string(), logoUrl: v.string(), isApproved: v.boolean() },
+  handler: async (ctx, args) => await ctx.db.insert("company", { ...args }),
+});
+
+export const updateCompany = mutationWithAuth({
+  args: {
+    companyId: v.id("company"),
+    name: v.string(),
+    logoUrl: v.string(),
+    isApproved: v.boolean(),
+  },
+  handler: async (ctx, args) =>
+    await ctx.db.replace(args.companyId, {
+      name: args.name,
+      logoUrl: args.logoUrl,
+      isApproved: args.isApproved,
     }),
 });
