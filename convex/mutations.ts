@@ -31,7 +31,7 @@ export const addTask = mutationWithAuth({
         v.literal("post"),
         v.literal("join"),
       ),
-      socialNetwork: v.union(
+      channel: v.union(
         v.literal("twitter"),
         v.literal("telegram"),
         v.literal("discord"),
@@ -60,7 +60,7 @@ export const updateTask = mutationWithAuth({
         v.literal("post"),
         v.literal("join"),
       ),
-      socialNetwork: v.union(
+      channel: v.union(
         v.literal("twitter"),
         v.literal("telegram"),
         v.literal("discord"),
@@ -92,7 +92,7 @@ export const createEvent = mutationWithAuth({
           v.literal("post"),
           v.literal("join"),
         ),
-        socialNetwork: v.union(
+        channel: v.union(
           v.literal("twitter"),
           v.literal("telegram"),
           v.literal("discord"),
@@ -120,7 +120,7 @@ export const updateEvent = mutationWithAuth({
           v.literal("post"),
           v.literal("join"),
         ),
-        socialNetwork: v.union(
+        channel: v.union(
           v.literal("twitter"),
           v.literal("telegram"),
           v.literal("discord"),

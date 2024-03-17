@@ -65,7 +65,7 @@ export default defineSchema(
           v.literal("post"),
           v.literal("join"),
         ),
-        socialNetwork: v.union(
+        channel: v.union(
           v.literal("twitter"),
           v.literal("telegram"),
           v.literal("discord"),
@@ -87,7 +87,7 @@ export default defineSchema(
             v.literal("post"),
             v.literal("join"),
           ),
-          socialNetwork: v.union(
+          channel: v.union(
             v.literal("twitter"),
             v.literal("telegram"),
             v.literal("discord"),
