@@ -334,7 +334,7 @@ function EventDialog({
               </SelectContent>
             </Select>
           </div>
-          <div className="grid w-full gap-2">
+          <div className="mt-10 grid w-full gap-2">
             <div className="flex items-center justify-between">
               <h1 className="font-medium">Actions</h1>
               <Button
