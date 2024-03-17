@@ -57,23 +57,21 @@ export default defineSchema(
     tasks: defineTable({
       name: v.string(),
       reward: v.number(),
-      action: v.union(
-        v.object({
-          link: v.string(),
-          type: v.literal("join"),
-          socialNetwork: v.union(v.literal("telegram"), v.literal("discord")),
-        }),
-        v.object({
-          link: v.string(),
-          type: v.literal("visit"),
-          socialNetwork: v.literal("website"),
-        }),
-        v.object({
-          entity: v.string(),
-          socialNetwork: v.literal("twitter"),
-          type: v.union(v.literal("follow"), v.literal("post")),
-        }),
-      ),
+      action: v.object({
+        link: v.string(),
+        type: v.union(
+          v.literal("visit"),
+          v.literal("follow"),
+          v.literal("post"),
+          v.literal("join"),
+        ),
+        socialNetwork: v.union(
+          v.literal("twitter"),
+          v.literal("telegram"),
+          v.literal("discord"),
+          v.literal("website"),
+        ),
+      }),
     }),
   },
   // If you ever get an error about schema mismatch
