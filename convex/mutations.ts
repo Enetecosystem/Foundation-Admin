@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { mutationWithAuth } from "@convex-dev/convex-lucia-auth";
 
 // Write your Convex functions in any file inside this directory (`convex`).
@@ -145,21 +145,42 @@ export const deleteEventWithId = mutationWithAuth({
 
 // Company
 export const createCompany = mutationWithAuth({
-  args: { name: v.string(), logoUrl: v.string(), isApproved: v.boolean() },
-  handler: async (ctx, args) => await ctx.db.insert("company", { ...args }),
+  args: {
+    name: v.string(),
+    logoStorageId: v.id("_storage"),
+    isApproved: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    if (!ctx.session || !ctx.session.user) {
+      throw new ConvexError({
+        message: "Must be logged in to upload",
+      });
+    }
+
+    await ctx.db.insert("company", {
+      name: args.name,
+      isApproved: args.isApproved,
+      logoStorageId: args.logoStorageId,
+    });
+  },
 });
 
 export const updateCompany = mutationWithAuth({
   args: {
     companyId: v.id("company"),
     name: v.string(),
-    logoUrl: v.string(),
+    logoStorageId: v.id("_storage"),
     isApproved: v.boolean(),
   },
   handler: async (ctx, args) =>
     await ctx.db.replace(args.companyId, {
       name: args.name,
-      logoUrl: args.logoUrl,
+      logoStorageId: args.logoStorageId,
       isApproved: args.isApproved,
     }),
+});
+
+export const deleteCompany = mutationWithAuth({
+  args: { companyId: v.id("company") },
+  handler: async (ctx, args) => await ctx.db.delete(args.companyId),
 });

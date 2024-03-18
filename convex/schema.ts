@@ -98,7 +98,7 @@ export default defineSchema(
     }),
     company: defineTable({
       name: v.string(),
-      logoUrl: v.string(),
+      logoStorageId: v.id("_storage"),
       isApproved: v.boolean(),
     }),
   },
