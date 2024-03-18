@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import {
-  CaretSortIcon,
+  // CaretSortIcon,
   DotsHorizontalIcon,
   PlusIcon,
 } from "@radix-ui/react-icons";
@@ -31,11 +31,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { FaXTwitter, FaDiscord, FaTelegram, FaGlobe } from "react-icons/fa6";
+import {
+  FaXTwitter,
+  FaDiscord,
+  FaTelegram,
+  FaGlobe,
+  FaCheckDouble,
+  FaX,
+} from "react-icons/fa6";
 import {
   Select,
   SelectContent,
@@ -45,26 +52,69 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { UploadButton, UploadFileResponse } from "@xixixao/uploadstuff/react";
+import { cn } from "@/lib/utils";
+import { BroadcastChannel } from "worker_threads";
+// import addHours from "date-fns/esm/addHours";
 
-type EventType = Doc<"events">;
+type EventType = Doc<"events"> & {
+  company: Doc<"company"> & { logoUrl: string };
+};
 type Network = "twitter" | "discord" | "telegram" | "website";
 type ActionType = "follow" | "post" | "join" | "visit";
 
 export default function Events() {
   const events = useQueryWithAuth(api.queries.fetchEvents, {});
+
   const deleteEvent = useMutationWithAuth(api.mutations.deleteEventWithId);
 
   // Editable modal open state
   const [open, setOpen] = useState<boolean>(false);
+  const [actionsDialogOpen, setActionsDialogOpen] = useState<boolean>(false);
   const [editableEvent, setEditableEvent] = useState<Doc<"events"> | null>(
     null,
   );
+  const [editableActions, setEditableActions] = useState<
+    { name: string; link: string; channel: Network; type: ActionType }[]
+  >([]);
 
+  const cleanupEventEditableState = () => setEditableEvent(null);
+
+  // Toggle event edit dialog
   useEffect(() => {
     if (editableEvent) {
       setOpen(true);
     }
   }, [editableEvent]);
+
+  // Toggle actions edit dialog
+  useEffect(() => {
+    if (editableActions) {
+      setActionsDialogOpen(true);
+    }
+  }, [editableActions]);
+
+  function set(key: string, at: number, value: any) {
+    const newActions = editableActions?.map((action, i) => {
+      if (i === at) {
+        return {
+          ...action,
+          [key]: value,
+          ...(key === "channel" && {
+            type: (value === "website"
+              ? "visit"
+              : value === "twitter"
+                ? "follow"
+                : "join") as ActionType,
+          }),
+        };
+      } else {
+        return action;
+      }
+    });
+
+    setEditableActions(newActions);
+  }
 
   const columns: ColumnDef<EventType>[] = [
     {
@@ -90,10 +140,10 @@ export default function Events() {
       enableHiding: false,
     },
     {
-      accessorKey: "name",
-      header: "Name",
+      accessorKey: "title",
+      header: "Title",
       cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("name")}</div>
+        <div className="capitalize">{row.getValue("title")}</div>
       ),
     },
     {
@@ -106,27 +156,34 @@ export default function Events() {
         );
       },
     },
-    // {
-    //   accessorKey: "company",
-    //   accessorFn: (ogRow, index) => ogRow.company,
-    //   header: "Company",
-    //   cell: ({ row }) => {
-    //     // const action = row.getValue("action");
-    //     const event = row.original;
+    {
+      id: "count",
+      // accessorKey: "company",
+      // accessorFn: (ogRow, index) => ogRow.company,
+      header: "Action count",
+      cell: ({ row }) => {
+        const count = row.original.actions.length;
+        return count.toLocaleString("en-US");
+      },
+    },
+    {
+      id: "company_name",
+      header: "Company Name",
+      cell: ({ row }) => {
+        const companyName = row.original.company.name;
 
-    //     const getIcon = (url: string) => {
-    //       return <img src={url} width={20} height={20} />;
-    //     };
+        return <div className="capitalize">{companyName}</div>;
+      },
+    },
+    {
+      id: "company_logo",
+      header: "Company logo",
+      cell: ({ row }) => {
+        const logoUrl = row.original.company?.logoUrl;
 
-    //     return (
-    //       <div className="flex items-center gap-2 capitalize">
-    //         {getIcon(event?.company.logoUrl)}
-    //         {event?.company.name}
-    //       </div>
-    //     );
-    //   },
-    // },
-
+        return <img src={logoUrl} className="h-8 w-8 rounded-lg" />;
+      },
+    },
     {
       id: "actions",
       enableHiding: false,
@@ -197,13 +254,162 @@ export default function Events() {
             }
           />
         </div>
+        <CompanyTable />
         <EventDialog
           open={open}
           event={editableEvent}
           onOpenChange={(open) => setOpen(open)}
+          closeCleanup={cleanupEventEditableState}
         />
       </div>
     </MainLayout>
+  );
+}
+
+function CompanyTable() {
+  const companies = useQueryWithAuth(api.queries.fetchCompanies, {});
+  const deleteCompany = useMutationWithAuth(api.mutations.deleteCompany);
+  const [editableCompany, setEditableCompany] = useState<Doc<"company"> | null>(
+    null,
+  );
+
+  // CompanyDialog openstate controls
+  const [open, setOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (editableCompany) {
+      console.log(editableCompany, ":::Company should be null");
+      setOpen(true);
+    }
+  }, [editableCompany]);
+
+  useEffect(() => {
+    if (!open) {
+      console.log(open, ":::Dialog should be close");
+      setEditableCompany(null);
+    }
+  }, [open]);
+
+  const columns: ColumnDef<Doc<"company">>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "name",
+      header: "Company Name",
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue("name")}</div>
+      ),
+    },
+    {
+      accessorKey: "reward",
+      header: "Approved",
+      cell: ({ row }) => {
+        const isApproved: boolean = row.original?.isApproved;
+        if (isApproved)
+          return <FaCheckDouble className="h-4 w-4 text-green-500" />;
+        return <FaX className="h-4 w-4 text-red-500" />;
+      },
+    },
+
+    {
+      id: "actions",
+      enableHiding: false,
+      cell: ({ row }) => {
+        const company = row.original;
+
+        return (
+          <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <DotsHorizontalIcon className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem
+                  className="mb-1 hover:cursor-pointer"
+                  onClick={() => {
+                    // setEditableTaskIndex(row.index);
+                    setEditableCompany(company);
+                  }}
+                >
+                  Edit company
+                </DropdownMenuItem>
+
+                {/* <DropdownMenuItem>View customer</DropdownMenuItem> */}
+                <DropdownMenuItem
+                  className="bg-red-500 hover:cursor-pointer"
+                  onClick={async () => {
+                    await deleteCompany({ companyId: company._id });
+                  }}
+                >
+                  Delete company
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
+        );
+      },
+    },
+  ];
+
+  return (
+    <div className="h-full w-full flex-1 flex-col space-y-8 p-8 md:flex">
+      <div className="flex items-center justify-between space-y-2">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Companies</h2>
+          <p className="text-muted-foreground">
+            Here&apos;s a list of all companies
+          </p>
+        </div>
+      </div>
+      <DataTable
+        filterVisible={false}
+        data={companies ?? []}
+        columns={columns}
+        extra={
+          <Button
+            className="gap-1"
+            onClick={() => {
+              console.log(editableCompany, ":::Company before new open");
+              setOpen(true);
+            }}
+          >
+            <PlusIcon className="h-4 w-4 font-bold" /> New company
+          </Button>
+        }
+      />
+      <CompanyDialog
+        open={open}
+        onOpenChange={(open) => setOpen(open)}
+        company={editableCompany}
+        closeCleanup={() => setEditableCompany(null)}
+      />
+    </div>
   );
 }
 
@@ -212,12 +418,14 @@ interface IEventDialogProps {
   event: Doc<"events"> | undefined | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  closeCleanup: () => void;
 }
 function EventDialog({
   children,
   event,
   open,
   onOpenChange,
+  closeCleanup,
 }: IEventDialogProps) {
   // Add task state
   const [title, setTitle] = useState("");
@@ -238,7 +446,7 @@ function EventDialog({
       setCompanyId(event?.companyId);
       setActions(event?.actions);
     }
-  }, [event]);
+  }, [event, closeCleanup, open]);
 
   // Action array dsipatch handler
   function set(key: string, at: number, value: any) {
@@ -274,9 +482,20 @@ function EventDialog({
   useEffect(() => console.log(actions), [actions]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} key={event?._id}>
+    <Dialog
+      open={open}
+      onOpenChange={(open: boolean) => {
+        setTitle("");
+        setReward(0);
+        setCompanyId(undefined);
+        setActions([]);
+        closeCleanup();
+        onOpenChange(open);
+      }}
+      key={event?._id}
+    >
       {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-      <DialogContent>
+      <DialogContent className="max-h-full overflow-y-scroll">
         <DialogTitle>{event ? "Edit event" : "Create a new event"}</DialogTitle>
         <div className="grid w-full items-center justify-start gap-2">
           <div>
@@ -517,9 +736,10 @@ function EventDialog({
           </DialogClose>
         </div>
       </DialogContent>
-      <CompanyCreateDialog
+      <CompanyDialog
         open={openCompanyDialog}
         onOpenChange={(open) => setOpenCompanyDialog(open)}
+        closeCleanup={() => {}}
       />
     </Dialog>
   );
@@ -528,19 +748,141 @@ function EventDialog({
 interface ICompanyDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  company?: Doc<"company"> | undefined | null;
+  closeCleanup: () => void;
   // children: React.ReactNode;
 }
-function CompanyCreateDialog({
+function CompanyDialog({
   open,
   onOpenChange,
+  company,
+  closeCleanup,
   // children,
 }: ICompanyDialogProps) {
+  // Creates a new company with uploaded logo and gets the url
+  const [name, setName] = useState<string>("");
+  const [isApproved, setIsApproved] = useState<boolean>(false);
+  const [companyLogoStorageId, setCompanyLogoStorageId] =
+    useState<Id<"_storage">>();
+
+  const generateUploadUrl = useMutationWithAuth(
+    api.files.generateUploadUrlForCompanyLogo,
+  );
+  const createCompany = useMutationWithAuth(api.mutations.createCompany);
+  const updateCompany = useMutationWithAuth(api.mutations.updateCompany);
+  const saveAfterUpload = async (uploaded: UploadFileResponse[]) => {
+    setCompanyLogoStorageId((uploaded[0].response as any)?.storageId);
+  };
+
+  // If event is to update company data
+  useEffect(() => {
+    // If company is passed in, update state
+    if (company) {
+      setName(company?.name);
+      setIsApproved(company?.isApproved);
+      setCompanyLogoStorageId(company?.logoStorageId);
+    }
+  }, [company, open]);
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(open: boolean) => {
+        console.log("cleanup.....");
+        closeCleanup();
+        setName("");
+        setIsApproved(false);
+        setCompanyLogoStorageId(undefined);
+        onOpenChange(open);
+      }}
+    >
       {/* <DialogTrigger asChild>{children}</DialogTrigger>/ */}
       <DialogContent>
         <DialogTitle>Create a new company</DialogTitle>
-        <div className="grid w-full items-center justify-start gap-2"></div>
+        <div className="grid w-full items-center justify-start gap-4">
+          <div>
+            <Label htmlFor="name">Company name</Label>
+            <Input
+              placeholder="Enter company name"
+              className="max-w-sm"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+
+          <div className="">
+            <Label>Uplaod a company logo, size 1:1</Label>
+            <UploadButton
+              uploadUrl={generateUploadUrl}
+              fileTypes={["image/*"]}
+              onUploadComplete={saveAfterUpload}
+              onUploadError={(error: unknown) => {
+                // Do something with the error.
+                alert(`ERROR! ${error as string}`);
+              }}
+              content={(progress) =>
+                progress ? `Uploading... ${progress}%` : "Upload logo"
+              }
+              className={(progress) =>
+                cn(
+                  "flex items-center justify-center rounded-lg bg-gray-200 px-4 py-2 text-black hover:cursor-pointer",
+                  {
+                    "bg-background border border-gray-500 text-white": progress,
+                  },
+                )
+              }
+            />
+          </div>
+
+          <div className="flex  w-full items-start justify-start gap-2">
+            <Checkbox
+              id="approve"
+              name="approve"
+              checked={isApproved}
+              onCheckedChange={(state) => setIsApproved(state as boolean)}
+            />
+            <Label htmlFor="approve">Approve the company</Label>
+          </div>
+
+          <DialogClose asChild>
+            <Button
+              onClick={async () => {
+                if (company) {
+                  if (!name.length) {
+                    return alert("Name is not set");
+                  }
+
+                  if (!companyLogoStorageId) {
+                    return alert("Upload a company logo to continue");
+                  }
+
+                  await updateCompany({
+                    companyId: company?._id,
+                    name,
+                    logoStorageId: companyLogoStorageId,
+                    isApproved: isApproved,
+                  });
+                } else {
+                  if (!name.length) {
+                    return alert("Name is not set");
+                  }
+
+                  if (!companyLogoStorageId) {
+                    return alert("Upload a company logo to continue");
+                  }
+
+                  await createCompany({
+                    logoStorageId: companyLogoStorageId,
+                    name,
+                    isApproved,
+                  });
+                }
+              }}
+            >
+              {company ? "Update company" : "Create company"}
+            </Button>
+          </DialogClose>
+        </div>
       </DialogContent>
     </Dialog>
   );

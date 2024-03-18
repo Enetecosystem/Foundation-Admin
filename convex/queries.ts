@@ -1,4 +1,5 @@
 import { queryWithAuth } from "@convex-dev/convex-lucia-auth";
+import { Id } from "./_generated/dataModel";
 
 export const dashboardData = queryWithAuth({
   args: {},
@@ -42,7 +43,13 @@ export const fetchEvents = queryWithAuth({
     return await Promise.all(
       events.map(async (event) => ({
         ...event,
-        company: { ...(await ctx.db.get(event.companyId)) },
+        company: {
+          ...(await ctx.db.get(event.companyId)),
+          logoUrl: await ctx.storage.getUrl(
+            (await ctx.db.get(event.companyId))
+              ?.logoStorageId as Id<"_storage">,
+          ),
+        },
       })),
     );
   },

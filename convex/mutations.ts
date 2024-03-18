@@ -101,7 +101,13 @@ export const createEvent = mutationWithAuth({
       }),
     ),
   },
-  handler: async (ctx, args) => await ctx.db.insert("events", { ...args }),
+  handler: async (ctx, args) =>
+    await ctx.db.insert("events", {
+      title: args.title,
+      reward: args.reward,
+      companyId: args.companyId,
+      actions: args.actions,
+    }),
 });
 
 export const updateEvent = mutationWithAuth({
