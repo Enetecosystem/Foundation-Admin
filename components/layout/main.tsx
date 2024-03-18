@@ -23,6 +23,7 @@ import {
 } from "@convex-dev/convex-lucia-auth/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React from "react";
+import { Label } from "../ui/label";
 
 export default function MainLayout({
   children,
@@ -211,16 +212,20 @@ function AuthForm() {
   console.log(error);
 
   return (
-    <div className="flex flex-col items-center gap-4 px-20">
+    <div className="flex h-screen min-h-screen flex-col items-center gap-6 px-20 pt-40">
+      <h1 className="text-center text-2xl font-medium">
+        Login to Enet admin
+        <br /> dashboard
+      </h1>
       <form
         className="flex w-[18rem] flex-col"
         onSubmit={(event) => {
           void onSubmit(event);
         }}
       >
-        <label htmlFor="email">Email</label>
+        <Label htmlFor="email">Email</Label>
         <Input name="email" type="email" id="email" className="mb-4" />
-        <label htmlFor="password">Password</label>
+        <Label htmlFor="password">Password</Label>
         <Input
           type="password"
           name="password"

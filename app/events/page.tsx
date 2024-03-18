@@ -86,35 +86,6 @@ export default function Events() {
     }
   }, [editableEvent]);
 
-  // Toggle actions edit dialog
-  // useEffect(() => {
-  //   if (editableActions) {
-  //     setActionsDialogOpen(true);
-  //   }
-  // }, [editableActions]);
-
-  // function set(key: string, at: number, value: any) {
-  //   const newActions = editableActions?.map((action, i) => {
-  //     if (i === at) {
-  //       return {
-  //         ...action,
-  //         [key]: value,
-  //         ...(key === "channel" && {
-  //           type: (value === "website"
-  //             ? "visit"
-  //             : value === "twitter"
-  //             ? "follow"
-  //             : "join") as ActionType,
-  //         }),
-  //       };
-  //     } else {
-  //       return action;
-  //     }
-  //   });
-
-  //   setEditableActions(newActions);
-  // }
-
   const columns: ColumnDef<EventType>[] = [
     {
       id: "select",
