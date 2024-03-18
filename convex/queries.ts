@@ -12,7 +12,7 @@ export const dashboardData = queryWithAuth({
     const totalXp = users.reduce((c, obj) => c + (obj.xpCount ?? 0), 0);
     const totalReferrals = users.reduce(
       (c, obj) => c + (obj.referralCount ?? 0),
-      0,
+      0
     );
     const totalUsers = users.length;
     const recentUsers = users.slice(0, 5);
@@ -41,16 +41,23 @@ export const fetchEvents = queryWithAuth({
     const events = await ctx.db.query("events").collect();
 
     return await Promise.all(
-      events.map(async (event) => ({
-        ...event,
-        company: {
-          ...(await ctx.db.get(event.companyId)),
-          logoUrl: await ctx.storage.getUrl(
-            (await ctx.db.get(event.companyId))
-              ?.logoStorageId as Id<"_storage">,
-          ),
-        },
-      })),
+      events.map(async (event) => {
+        const company = await ctx.db.get(event.companyId);
+        // if(!company) {
+        //   throw new Error("No company found");
+        // }
+        const logoUrl = await ctx.storage.getUrl(
+          company?.logoStorageId as Id<"_storage">
+        );
+
+        return {
+          ...event,
+          company: {
+            ...company,
+            logoUrl: logoUrl ?? "",
+          },
+        };
+      })
     );
   },
 });

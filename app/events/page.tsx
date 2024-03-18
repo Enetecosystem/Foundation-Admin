@@ -1,29 +1,9 @@
 "use client";
 
 import MainLayout from "@/components/layout/main";
-import { DataTable } from "@/components/ui/data-table";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import {
-  // CaretSortIcon,
-  DotsHorizontalIcon,
-  PlusIcon,
-} from "@radix-ui/react-icons";
-import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Doc, Id } from "@/convex/_generated/dataModel";
-import {
-  useMutationWithAuth,
-  useQueryWithAuth,
-} from "@convex-dev/convex-lucia-auth/react";
-import { api } from "@/convex/_generated/api";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DataTable } from "@/components/ui/data-table";
 import {
   Dialog,
   DialogClose,
@@ -31,18 +11,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import React, { useEffect, useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import {
-  FaXTwitter,
-  FaDiscord,
-  FaTelegram,
-  FaGlobe,
-  FaCheckDouble,
-  FaX,
-} from "react-icons/fa6";
 import {
   Select,
   SelectContent,
@@ -52,31 +30,52 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { UploadButton, UploadFileResponse } from "@xixixao/uploadstuff/react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { api } from "@/convex/_generated/api";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
-import { BroadcastChannel } from "worker_threads";
+import {
+  useMutationWithAuth,
+  useQueryWithAuth,
+} from "@convex-dev/convex-lucia-auth/react";
+import {
+  // CaretSortIcon,
+  DotsHorizontalIcon,
+  PlusIcon,
+} from "@radix-ui/react-icons";
+import { ColumnDef } from "@tanstack/react-table";
+import { UploadButton, UploadFileResponse } from "@xixixao/uploadstuff/react";
+import React, { useEffect, useState } from "react";
+import {
+  FaCheckDouble,
+  FaDiscord,
+  FaGlobe,
+  FaTelegram,
+  FaX,
+  FaXTwitter,
+} from "react-icons/fa6";
 // import addHours from "date-fns/esm/addHours";
 
-type EventType = Doc<"events"> & {
-  company: Doc<"company"> & { logoUrl: string };
+type EventType = Partial<Doc<"events">> & {
+  company: Partial<Doc<"company">> & { logoUrl: string };
 };
 type Network = "twitter" | "discord" | "telegram" | "website";
 type ActionType = "follow" | "post" | "join" | "visit";
 
 export default function Events() {
-  const events = useQueryWithAuth(api.queries.fetchEvents, {});
+  const events: EventType[] | undefined = useQueryWithAuth(
+    api.queries.fetchEvents,
+    {}
+  );
 
   const deleteEvent = useMutationWithAuth(api.mutations.deleteEventWithId);
 
   // Editable modal open state
   const [open, setOpen] = useState<boolean>(false);
-  const [actionsDialogOpen, setActionsDialogOpen] = useState<boolean>(false);
-  const [editableEvent, setEditableEvent] = useState<Doc<"events"> | null>(
-    null,
-  );
-  const [editableActions, setEditableActions] = useState<
-    { name: string; link: string; channel: Network; type: ActionType }[]
-  >([]);
+  const [editableEvent, setEditableEvent] = useState<EventType | null>(null);
+  // const [editableActions, setEditableActions] = useState<
+  //   { name: string; link: string; channel: Network; type: ActionType }[]
+  // >([]);
 
   const cleanupEventEditableState = () => setEditableEvent(null);
 
@@ -88,33 +87,33 @@ export default function Events() {
   }, [editableEvent]);
 
   // Toggle actions edit dialog
-  useEffect(() => {
-    if (editableActions) {
-      setActionsDialogOpen(true);
-    }
-  }, [editableActions]);
+  // useEffect(() => {
+  //   if (editableActions) {
+  //     setActionsDialogOpen(true);
+  //   }
+  // }, [editableActions]);
 
-  function set(key: string, at: number, value: any) {
-    const newActions = editableActions?.map((action, i) => {
-      if (i === at) {
-        return {
-          ...action,
-          [key]: value,
-          ...(key === "channel" && {
-            type: (value === "website"
-              ? "visit"
-              : value === "twitter"
-                ? "follow"
-                : "join") as ActionType,
-          }),
-        };
-      } else {
-        return action;
-      }
-    });
+  // function set(key: string, at: number, value: any) {
+  //   const newActions = editableActions?.map((action, i) => {
+  //     if (i === at) {
+  //       return {
+  //         ...action,
+  //         [key]: value,
+  //         ...(key === "channel" && {
+  //           type: (value === "website"
+  //             ? "visit"
+  //             : value === "twitter"
+  //             ? "follow"
+  //             : "join") as ActionType,
+  //         }),
+  //       };
+  //     } else {
+  //       return action;
+  //     }
+  //   });
 
-    setEditableActions(newActions);
-  }
+  //   setEditableActions(newActions);
+  // }
 
   const columns: ColumnDef<EventType>[] = [
     {
@@ -159,18 +158,19 @@ export default function Events() {
     {
       id: "count",
       // accessorKey: "company",
-      // accessorFn: (ogRow, index) => ogRow.company,
+      accessorFn: (row) => (row?.actions ?? []).length,
       header: "Action count",
-      cell: ({ row }) => {
-        const count = row.original.actions.length;
+      cell: ({ getValue }) => {
+        const count = getValue() as number;
         return count.toLocaleString("en-US");
       },
     },
     {
       id: "company_name",
       header: "Company Name",
-      cell: ({ row }) => {
-        const companyName = row.original.company.name;
+      accessorFn: (row) => row.company.name,
+      cell: ({ getValue }) => {
+        const companyName = getValue() as string;
 
         return <div className="capitalize">{companyName}</div>;
       },
@@ -178,8 +178,9 @@ export default function Events() {
     {
       id: "company_logo",
       header: "Company logo",
-      cell: ({ row }) => {
-        const logoUrl = row.original.company?.logoUrl;
+      accessorFn: (row) => row.company?.logoUrl,
+      cell: ({ getValue }) => {
+        const logoUrl = getValue() as string;
 
         return <img src={logoUrl} className="h-8 w-8 rounded-lg" />;
       },
@@ -217,7 +218,7 @@ export default function Events() {
                 <DropdownMenuItem
                   className="bg-red-500 hover:cursor-pointer"
                   onClick={async () => {
-                    await deleteEvent({ eventId: event._id });
+                    await deleteEvent({ eventId: event._id as Id<"events"> });
                   }}
                 >
                   Delete event
@@ -270,7 +271,7 @@ function CompanyTable() {
   const companies = useQueryWithAuth(api.queries.fetchCompanies, {});
   const deleteCompany = useMutationWithAuth(api.mutations.deleteCompany);
   const [editableCompany, setEditableCompany] = useState<Doc<"company"> | null>(
-    null,
+    null
   );
 
   // CompanyDialog openstate controls
@@ -415,7 +416,7 @@ function CompanyTable() {
 
 interface IEventDialogProps {
   children?: React.ReactNode;
-  event: Doc<"events"> | undefined | null;
+  event: EventType | undefined | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   closeCleanup: () => void;
@@ -428,12 +429,13 @@ function EventDialog({
   closeCleanup,
 }: IEventDialogProps) {
   // Add task state
-  const [title, setTitle] = useState("");
-  const [reward, setReward] = useState(0);
+  const [title, setTitle] = useState<string>();
+  const [reward, setReward] = useState<number>();
   const [companyId, setCompanyId] = useState<Id<"company">>();
-  const [actions, setActions] = useState<
-    { name: string; link: string; channel: Network; type: ActionType }[]
-  >([]);
+  const [actions, setActions] =
+    useState<
+      { name: string; link: string; channel: Network; type: ActionType }[]
+    >();
 
   const updateEvent = useMutationWithAuth(api.mutations.updateEvent);
   const createEvent = useMutationWithAuth(api.mutations.createEvent);
@@ -459,8 +461,8 @@ function EventDialog({
             type: (value === "website"
               ? "visit"
               : value === "twitter"
-                ? "follow"
-                : "join") as ActionType,
+              ? "follow"
+              : "join") as ActionType,
           }),
         };
       } else {
@@ -560,7 +562,7 @@ function EventDialog({
                 size="sm"
                 onClick={() => {
                   setActions([
-                    ...actions,
+                    ...(actions ?? []),
                     { name: "", link: "", channel: "discord", type: "join" },
                   ]);
                 }}
@@ -700,8 +702,8 @@ function EventDialog({
                 if (event) {
                   await updateEvent({
                     eventId: event?._id as Id<"events">,
-                    title,
-                    reward,
+                    title: title as string,
+                    reward: reward as number,
                     companyId: companyId as Id<"company">,
                     actions: actions
                       ? actions.map(({ name, link, type, channel }) => ({
@@ -718,8 +720,8 @@ function EventDialog({
                   }
 
                   await createEvent({
-                    title,
-                    reward,
+                    title: title as string,
+                    reward: reward as number,
                     companyId: companyId as Id<"company">,
                     actions: actions.map(({ name, link, type, channel }) => ({
                       name,
@@ -757,8 +759,8 @@ function CompanyDialog({
   onOpenChange,
   company,
   closeCleanup,
-  // children,
-}: ICompanyDialogProps) {
+}: // children,
+ICompanyDialogProps) {
   // Creates a new company with uploaded logo and gets the url
   const [name, setName] = useState<string>("");
   const [isApproved, setIsApproved] = useState<boolean>(false);
@@ -766,7 +768,7 @@ function CompanyDialog({
     useState<Id<"_storage">>();
 
   const generateUploadUrl = useMutationWithAuth(
-    api.files.generateUploadUrlForCompanyLogo,
+    api.files.generateUploadUrlForCompanyLogo
   );
   const createCompany = useMutationWithAuth(api.mutations.createCompany);
   const updateCompany = useMutationWithAuth(api.mutations.updateCompany);
@@ -828,7 +830,7 @@ function CompanyDialog({
                   "flex items-center justify-center rounded-lg bg-gray-200 px-4 py-2 text-black hover:cursor-pointer",
                   {
                     "bg-background border border-gray-500 text-white": progress,
-                  },
+                  }
                 )
               }
             />
