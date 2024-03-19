@@ -43,7 +43,7 @@ export default function MainLayout({
 }
 
 function SignedIn({ children }: { children: React.ReactNode }) {
-  const data = useQueryWithAuth(api.queries.dashboardData, {});
+  const data = useQueryWithAuth(api.adminQueries.dashboardData, {});
   const menus: string[] = ["Users", "Tasks", "Events", "Ad Space"];
   const sidebar = (
     <nav className={"grid items-center space-y-4 lg:space-y-6"}>
