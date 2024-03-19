@@ -11,9 +11,6 @@ export default defineSchema(
       session: {},
     }),
     // This definition matches the example query and mutation code:
-    numbers: defineTable({
-      value: v.number(),
-    }),
     user: defineTable({
       email: v.string(),
       minedCount: v.optional(v.float64()),

@@ -26,8 +26,8 @@ export default function Users() {
     Doc<"user">,
     "speedBoost" | "botBoost" | "password" | "otpSecret" | "miningStartTime"
   >;
-  const users = useQueryWithAuth(api.queries.fetchUsers, {});
-  const deleteUser = useMutationWithAuth(api.mutations.deleteUserWithId);
+  const users = useQueryWithAuth(api.adminQueries.fetchUsers, {});
+  const deleteUser = useMutationWithAuth(api.adminMutations.deleteUserWithId);
 
   const columns: ColumnDef<UserType>[] = [
     {

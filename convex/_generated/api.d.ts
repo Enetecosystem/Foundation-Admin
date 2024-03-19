@@ -14,9 +14,13 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as adminMutations from "../adminMutations.js";
+import type * as adminQueries from "../adminQueries.js";
 import type * as auth from "../auth.js";
 import type * as files from "../files.js";
 import type * as mutations from "../mutations.js";
+import type * as novu from "../novu.js";
+import type * as onboarding from "../onboarding.js";
 import type * as queries from "../queries.js";
 
 /**
@@ -28,9 +32,13 @@ import type * as queries from "../queries.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  adminMutations: typeof adminMutations;
+  adminQueries: typeof adminQueries;
   auth: typeof auth;
   files: typeof files;
   mutations: typeof mutations;
+  novu: typeof novu;
+  onboarding: typeof onboarding;
   queries: typeof queries;
 }>;
 export declare const api: FilterApi<

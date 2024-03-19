@@ -15,7 +15,7 @@ import { api } from "@/convex/_generated/api";
 import MainLayout from "@/components/layout/main";
 
 export default function Home() {
-  const data = useQueryWithAuth(api.queries.dashboardData, {});
+  const data = useQueryWithAuth(api.adminQueries.dashboardData, {});
   return (
     <MainLayout>
       <div className="mt-5 grid gap-4 md:grid-cols-2 lg:grid-cols-7">

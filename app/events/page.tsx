@@ -64,11 +64,11 @@ type ActionType = "follow" | "post" | "join" | "visit";
 
 export default function Events() {
   const events: EventType[] | undefined = useQueryWithAuth(
-    api.queries.fetchEvents,
-    {}
+    api.adminQueries.fetchEvents,
+    {},
   );
 
-  const deleteEvent = useMutationWithAuth(api.mutations.deleteEventWithId);
+  const deleteEvent = useMutationWithAuth(api.adminMutations.deleteEventWithId);
 
   // Editable modal open state
   const [open, setOpen] = useState<boolean>(false);
@@ -239,10 +239,10 @@ export default function Events() {
 }
 
 function CompanyTable() {
-  const companies = useQueryWithAuth(api.queries.fetchCompanies, {});
-  const deleteCompany = useMutationWithAuth(api.mutations.deleteCompany);
+  const companies = useQueryWithAuth(api.adminQueries.fetchCompanies, {});
+  const deleteCompany = useMutationWithAuth(api.adminMutations.deleteCompany);
   const [editableCompany, setEditableCompany] = useState<Doc<"company"> | null>(
-    null
+    null,
   );
 
   // CompanyDialog openstate controls
@@ -408,9 +408,9 @@ function EventDialog({
       { name: string; link: string; channel: Network; type: ActionType }[]
     >();
 
-  const updateEvent = useMutationWithAuth(api.mutations.updateEvent);
-  const createEvent = useMutationWithAuth(api.mutations.createEvent);
-  const getCompanies = useQueryWithAuth(api.queries.fetchCompanies, {});
+  const updateEvent = useMutationWithAuth(api.adminMutations.updateEvent);
+  const createEvent = useMutationWithAuth(api.adminMutations.createEvent);
+  const getCompanies = useQueryWithAuth(api.adminQueries.fetchCompanies, {});
 
   useEffect(() => {
     if (event) {
@@ -432,8 +432,8 @@ function EventDialog({
             type: (value === "website"
               ? "visit"
               : value === "twitter"
-              ? "follow"
-              : "join") as ActionType,
+                ? "follow"
+                : "join") as ActionType,
           }),
         };
       } else {
@@ -739,10 +739,10 @@ ICompanyDialogProps) {
     useState<Id<"_storage">>();
 
   const generateUploadUrl = useMutationWithAuth(
-    api.files.generateUploadUrlForCompanyLogo
+    api.files.generateUploadUrlForCompanyLogo,
   );
-  const createCompany = useMutationWithAuth(api.mutations.createCompany);
-  const updateCompany = useMutationWithAuth(api.mutations.updateCompany);
+  const createCompany = useMutationWithAuth(api.adminMutations.createCompany);
+  const updateCompany = useMutationWithAuth(api.adminMutations.updateCompany);
   const saveAfterUpload = async (uploaded: UploadFileResponse[]) => {
     setCompanyLogoStorageId((uploaded[0].response as any)?.storageId);
   };
@@ -801,7 +801,7 @@ ICompanyDialogProps) {
                   "flex items-center justify-center rounded-lg bg-gray-200 px-4 py-2 text-black hover:cursor-pointer",
                   {
                     "bg-background border border-gray-500 text-white": progress,
-                  }
+                  },
                 )
               }
             />

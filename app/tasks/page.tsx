@@ -51,9 +51,9 @@ type Network = "twitter" | "discord" | "telegram" | "website";
 type ActionType = "follow" | "post" | "join" | "visit";
 
 export default function Tasks() {
-  const tasks = useQueryWithAuth(api.queries.fetchTasks, {});
-  const deleteTask = useMutationWithAuth(api.mutations.deleteTaskWithId);
-  const addTask = useMutationWithAuth(api.mutations.addTask);
+  const tasks = useQueryWithAuth(api.adminQueries.fetchTasks, {});
+  const deleteTask = useMutationWithAuth(api.adminMutations.deleteTaskWithId);
+  const addTask = useMutationWithAuth(api.adminMutations.addTask);
 
   // Add task state
   const [name, setName] = useState("");
@@ -391,7 +391,7 @@ function EditableTaskDialog({ task, open, onOpenChange }: IEditableTaskProps) {
     useState<ActionType>("follow");
   const [linkEditable, setEditableLink] = useState("");
 
-  const updateTask = useMutationWithAuth(api.mutations.updateTask);
+  const updateTask = useMutationWithAuth(api.adminMutations.updateTask);
 
   useEffect(() => {
     if (task) {
