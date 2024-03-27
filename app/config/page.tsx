@@ -1,5 +1,10 @@
-import MainLayout from "@/components/layout/main";
+"use client"
 
+import MainLayout from "@/components/layout/main";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 
 // TODO: handle updates for the default settings of the mobile app
@@ -10,6 +15,12 @@ import MainLayout from "@/components/layout/main";
 
 
 function ConfigPage() {
+
+
+  const [miningRate, setMiningRate] = useState<number>(2);
+  const [miningHours, setMiningHours] = useState<number>(6);
+  const [xpCount, setXpCount] = useState<number>(1000);
+
 
   return (
     <MainLayout>
@@ -23,6 +34,56 @@ function ConfigPage() {
               </p>
             </div>
           </div>
+
+          {/* List of configuration cards */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Mining rate</CardTitle>
+              <CardDescription>
+                Change the default mining rate of users (i.e $EN/hour)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form>
+                <Input placeholder="Mining rate" type="number" value={miningRate} onChange={e => setMiningRate(e.target.valueAsNumber)} />
+              </form>
+            </CardContent>
+            <CardFooter className="border-t px-6 py-4">
+              <Button>Save</Button>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Mining hours</CardTitle>
+              <CardDescription>
+                Change the default mining hours per mining session
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form>
+                <Input placeholder="Mining hours" type="number" value={miningHours} onChange={e => setMiningHours(e.target.valueAsNumber)} />
+              </form>
+            </CardContent>
+            <CardFooter className="border-t px-6 py-4">
+              <Button>Save</Button>
+            </CardFooter>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>XP Count</CardTitle>
+              <CardDescription>
+                Change default XP Count after onboarding
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form>
+                <Input placeholder="XP Count" type="number" value={xpCount} onChange={e => setXpCount(e.target.valueAsNumber)} />
+              </form>
+            </CardContent>
+            <CardFooter className="border-t px-6 py-4">
+              <Button>Save</Button>
+            </CardFooter>
+          </Card>
         </div>
       </div>
     </MainLayout>
